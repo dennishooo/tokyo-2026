@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Winter Expedition: Tokyo, Yuzawa & Karuizawa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .active-tab {
+            background-color: #1e293b; /* slate-800 */
+            color: #ffffff;
+            border-bottom: 4px solid #3b82f6; /* blue-500 */
+        }
+        
+        .inactive-tab {
+            background-color: #f8fafc;
+            color: #64748b;
+            border-bottom: 4px solid transparent;
+        }
+        
+        .inactive-tab:hover {
+            background-color: #e2e8f0;
+        }
+
+        .timeline-connector {
+            position: absolute;
+            left: 24px;
+            top: 40px;
+            bottom: -20px;
+            width: 2px;
+            background-color: #e2e8f0;
+            z-index: 0;
+        }
+        
+        .timeline-item:last-child .timeline-connector {
+            display: none;
+        }
+
+        /* Map Marker Animation */
+        .map-marker {
+            transition: all 0.3s ease;
+        }
+        .map-marker:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        .map-tooltip {
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .map-marker:hover .map-tooltip {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans leading-relaxed selection:bg-blue-100">
+
+    <!-- Header / Hero -->
+    <header class="bg-slate-900 text-white py-10 px-4 shadow-lg">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-3xl md:text-5xl font-light tracking-wide mb-4">Strategic Winter Expedition</h1>
+            <p class="text-xl md:text-2xl text-slate-300 font-light">Tokyo (東京) • Echigo-Yuzawa (越後湯澤) • Karuizawa (輕井澤)</p>
+            <div class="mt-6 flex flex-wrap justify-center gap-4 text-sm md:text-base font-medium">
+                <span class="bg-slate-800 px-4 py-2 rounded-full border border-slate-700">🗓️ Jan 24 - Feb 1, 2026</span>
+                <span class="bg-slate-800 px-4 py-2 rounded-full border border-slate-700">❄️ Snow Sports</span>
+                <span class="bg-slate-800 px-4 py-2 rounded-full border border-slate-700">🏛️ Architecture</span>
+                <span class="bg-slate-800 px-4 py-2 rounded-full border border-slate-700">🛍️ Shopping</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-12">
+
+        <!-- INTRO & ANALYTICS SECTION -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Text Intro -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 border-l-4 border-blue-500 pl-3">Executive Summary</h2>
+                <p class="text-slate-600 mb-4">
+                    This finalized itinerary optimizes travel flow by utilizing the arrival day for urban recovery in Tokyo before transferring to the "Snow Country." The schedule is rigorously structured:
+                </p>
+                <ul class="space-y-2 mb-6 text-sm text-slate-700">
+                    <li class="flex items-start"><span class="mr-2">🚄</span> <strong>Strategic Transit:</strong> JR Tokyo Wide Pass activation on Day 1 for immediate Shinkansen savings.</li>
+                    <li class="flex items-start"><span class="mr-2">🏂</span> <strong>Skill Acquisition:</strong> Full-day lesson followed by targeted practice to maximize muscle memory.</li>
+                    <li class="flex items-start"><span class="mr-2">👜</span> <strong>Sophisticated Interlude:</strong> Karuizawa serves as a high-end bridge between mountain sports and urban retail.</li>
+                </ul>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h3 class="font-bold text-blue-800 mb-2">💰 Budget Target</h3>
+                    <p class="text-blue-700 text-sm">Accommodation: HKD 1,000–1,600 (JPY 19k–30k) per night.</p>
+                </div>
+            </div>
+
+            <!-- Analytics Charts -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-800 mb-4 border-l-4 border-indigo-500 pl-3">Expedition Analytics</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Trip Balance Chart -->
+                    <div class="flex flex-col items-center">
+                        <h4 class="text-xs font-semibold text-slate-500 uppercase mb-2">Activity Distribution</h4>
+                        <div class="chart-container h-48">
+                            <canvas id="balanceChart"></canvas>
+                        </div>
+                    </div>
+                    <!-- Budget Chart -->
+                    <div class="flex flex-col items-center">
+                        <h4 class="text-xs font-semibold text-slate-500 uppercase mb-2">Est. Hotel Cost (JPY)</h4>
+                        <div class="chart-container h-48">
+                            <canvas id="budgetChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SNOWBOARDING STRATEGY VISUALIZER -->
+        <section class="bg-slate-900 text-white p-8 rounded-xl shadow-lg relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 opacity-10 text-9xl">❄️</div>
+            <h2 class="text-2xl font-bold mb-6 relative z-10">🏂 Snowboarding Progression Strategy</h2>
+            <p class="text-slate-400 mb-8 max-w-2xl relative z-10">A structured approach to skill acquisition over 4 days in Echigo-Yuzawa (越後湯澤).</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative z-10">
+                <!-- Step 1 -->
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 hover:border-blue-400 transition-colors">
+                    <div class="text-blue-400 font-bold text-lg mb-1">Day 2</div>
+                    <div class="text-xl font-bold mb-2">Foundation</div>
+                    <p class="text-xs text-slate-400 mb-2">Full Day Lesson @ Ishiuchi Maruyama (石打丸山)</p>
+                    <ul class="text-xs text-slate-300 list-disc list-inside">
+                        <li>Stance & Braking</li>
+                        <li>Basic Turns</li>
+                        <li>Speed Control</li>
+                    </ul>
+                </div>
+                <!-- Step 2 -->
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 hover:border-blue-400 transition-colors">
+                    <div class="text-blue-400 font-bold text-lg mb-1">Day 3</div>
+                    <div class="text-xl font-bold mb-2">Refinement</div>
+                    <p class="text-xs text-slate-400 mb-2">Morning Lesson + Self Practice</p>
+                    <ul class="text-xs text-slate-300 list-disc list-inside">
+                        <li>Correcting Habits</li>
+                        <li>Steeper Gradients</li>
+                        <li>Muscle Memory</li>
+                    </ul>
+                </div>
+                <!-- Step 3 -->
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 hover:border-blue-400 transition-colors">
+                    <div class="text-blue-400 font-bold text-lg mb-1">Day 4</div>
+                    <div class="text-xl font-bold mb-2">Culture Break</div>
+                    <p class="text-xs text-slate-400 mb-2">Kiyotsu Gorge (清津峽) + Night Ski</p>
+                    <ul class="text-xs text-slate-300 list-disc list-inside">
+                        <li>Visual Inspiration</li>
+                        <li>Kandatsu Resort</li>
+                        <li>Optional "Nighter"</li>
+                    </ul>
+                </div>
+                <!-- Step 4 -->
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 hover:border-blue-400 transition-colors">
+                    <div class="text-blue-400 font-bold text-lg mb-1">Day 5</div>
+                    <div class="text-xl font-bold mb-2">Final Run</div>
+                    <p class="text-xs text-slate-400 mb-2">Morning @ Yuzawa Kogen (湯澤高原)</p>
+                    <ul class="text-xs text-slate-300 list-disc list-inside">
+                        <li>Scenic Runs</li>
+                        <li>Application of Skills</li>
+                        <li>Transit Departure</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESORT MAPS & INTELLIGENCE -->
+        <section id="resort-maps">
+            <h2 class="text-3xl font-bold text-slate-800 mb-6">Terrain Intelligence</h2>
+            
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                <!-- Tabs -->
+                <div class="flex border-b border-slate-200 bg-slate-50" id="resort-tabs">
+                    <!-- JS populated -->
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Left: Stats -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <div>
+                            <h3 id="resort-title" class="text-2xl font-bold text-slate-900">Resort Name</h3>
+                            <p id="resort-desc" class="text-slate-600 text-sm mt-2">Description goes here.</p>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2 text-center">Difficulty Profile</h4>
+                            <div class="chart-container h-48">
+                                <canvas id="difficultyChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-center">
+                            <div class="bg-blue-50 p-2 rounded border border-blue-100">
+                                <div class="text-xs text-blue-500 uppercase font-bold">Max Elev</div>
+                                <div id="resort-elev" class="text-lg font-bold text-slate-800">-- m</div>
+                            </div>
+                            <div class="bg-blue-50 p-2 rounded border border-blue-100">
+                                <div class="text-xs text-blue-500 uppercase font-bold">Longest Run</div>
+                                <div id="resort-run" class="text-lg font-bold text-slate-800">-- km</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Tactical Map -->
+                    <div class="lg:col-span-2 relative">
+                        <div class="bg-gradient-to-b from-slate-100 to-slate-200 w-full h-96 rounded-xl border-2 border-slate-300 relative overflow-hidden shadow-inner group" id="map-container">
+                            <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, #cbd5e1 0px, #cbd5e1 1px, transparent 1px, transparent 10px);"></div>
+                            <div class="absolute top-4 left-4 bg-white/80 backdrop-blur px-3 py-1 rounded text-xs font-bold text-slate-500">TACTICAL SCHEMATIC VIEW</div>
+                            
+                            <!-- Map Markers injected here -->
+                            <div id="map-markers"></div>
+                        </div>
+                        <p class="text-center text-xs text-slate-400 mt-2">Interactive Schematic. Hover points for intelligence.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ITINERARY MISSION CONTROL -->
+        <section>
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-slate-800">Operational Timeline</h2>
+                <p class="text-slate-600">Select a day to view detailed logistics, activities, and dining plans.</p>
+            </div>
+
+            <!-- Day Selector (Scrollable on mobile) -->
+            <div class="flex overflow-x-auto space-x-2 pb-4 mb-4 scrollbar-hide" id="day-tabs">
+                <!-- JS will populate buttons here -->
+            </div>
+
+            <!-- Dynamic Day Content -->
+            <div id="day-content" class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden min-h-[500px]">
+                <!-- JS will inject content here -->
+                <div class="p-12 text-center text-slate-400">
+                    <p>Select a day to begin mission briefing.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- COLLECTIONS GRID -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Culinary Checklist -->
+            <div class="bg-amber-50 rounded-xl p-6 border border-amber-100">
+                <h3 class="text-xl font-bold text-amber-900 mb-4 flex items-center">
+                    <span class="bg-amber-200 p-2 rounded-lg mr-3">🍜</span> Culinary Targets
+                </h3>
+                <p class="text-sm text-amber-800 mb-4">Priority dining experiences identified in the report.</p>
+                <div class="space-y-3" id="food-list">
+                    <!-- JS populated -->
+                </div>
+            </div>
+
+            <!-- Architectural Highlights -->
+            <div class="bg-slate-100 rounded-xl p-6 border border-slate-200">
+                <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center">
+                    <span class="bg-slate-300 p-2 rounded-lg mr-3">🏛️</span> Architectural Focus
+                </h3>
+                <p class="text-sm text-slate-600 mb-4">Key structures blending design with environment.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="arch-list">
+                    <!-- JS populated -->
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER LOGISTICS -->
+        <footer class="bg-slate-800 text-slate-300 p-8 rounded-t-xl mt-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h4 class="text-white font-bold mb-3">Transit Strategy</h4>
+                    <ul class="text-sm space-y-2">
+                        <li><strong>Day 1-3:</strong> JR Tokyo Wide Pass (Active Jan 24)</li>
+                        <li><strong>Day 5:</strong> Single Ticket (Yuzawa → Karuizawa)</li>
+                        <li><strong>Day 8:</strong> Single Ticket (Karuizawa → Ueno)</li>
+                        <li><strong>Day 9:</strong> Skyliner (Ueno → Narita)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-3">Luggage Ops</h4>
+                    <ul class="text-sm space-y-2">
+                        <li><strong>Day 1:</strong> Forward main bags from HND to Yuzawa Hotel (湯澤大酒店).</li>
+                        <li><strong>Carry-on:</strong> Backpack for Day 1 essentials & gear basics.</li>
+                        <li><strong>Day 5:</strong> Travel with bags to Karuizawa.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-3">Hotel Targets</h4>
+                    <ul class="text-sm space-y-2">
+                        <li><span class="text-slate-500">Yuzawa:</span> Yuzawa Grand Hotel (湯澤大酒店)</li>
+                        <li><span class="text-slate-500">Karuizawa:</span> Prince Hotel West (輕井澤王子大飯店)</li>
+                        <li><span class="text-slate-500">Tokyo:</span> NOHGA HOTEL UENO</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-slate-700 text-center text-xs text-slate-500">
+                Generated from "Strategic Winter Expedition Report" (Final Version).
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- DATA STORAGE ---
+        const itineraryData = [
+            {
+                day: 1,
+                date: "Jan 24 (Sat)",
+                title: "Arrival & Urban Recovery",
+                theme: "Logistics & Food",
+                location: "Tokyo (東京) → Yuzawa (湯澤)",
+                icon: "✈️",
+                events: [
+                    { time: "04:45", title: "Arrival @ Haneda (羽田)", detail: "Clear immigration. Forward large luggage to Yuzawa Grand Hotel via Yamato/JAL ABC. Keep backpack." },
+                    { time: "06:00", title: "Transit to City", detail: "Monorail to Hamamatsucho (濱松町) → JR Yamanote to Tokyo Station (東京站)." },
+                    { time: "07:30", title: "Breakfast @ Tsukiji (築地)", detail: "Drop bag in locker. Sushi Zanmai (壽司三昧) or Kitsuneya (狐狸屋) for Horumon-don." },
+                    { time: "10:00", title: "Ginza (銀座) Exploration", detail: "Ginza Six Rooftop, Tsutaya Books (蔦屋書店). Lunch: Godai Hanayama Udon (五代目 花山烏冬). Coffee: Café de L'Ambre (琥珀咖啡)." },
+                    { time: "18:00", title: "Transit to Snow Country", detail: "Retrieve bags. Joetsu Shinkansen (Toki/Tanigawa). Eat Ekiben (駅弁) on train." },
+                    { time: "19:30", title: "Check-in & Onsen", detail: "Yuzawa Grand Hotel (湯澤大酒店) (2 mins from West Exit). Relax in Onsen." }
+                ],
+                highlight: "Activate JR Tokyo Wide Pass today."
+            },
+            {
+                day: 2,
+                date: "Jan 25 (Sun)",
+                title: "Intensive Skills Acquisition",
+                theme: "Snowboarding",
+                location: "Yuzawa (Ishiuchi Maruyama 石打丸山)",
+                icon: "🏂",
+                events: [
+                    { time: "08:00", title: "Equipment Rental", detail: "Boo Sports or Daishin Sports." },
+                    { time: "09:30", title: "Full Day Lesson", detail: "Ishiuchi Maruyama (石打丸山). Morning: Stance/Braking. Lunch: Mochi-buta Curry (越後麻糬豬咖哩)." },
+                    { time: "12:30", title: "Afternoon Session", detail: "Linking turns & speed control." },
+                    { time: "18:00", title: "Dinner", detail: "Shabu-Shabu or Sukiyaki at Ninzin (人參) or Yasubei (保兵衛)." }
+                ],
+                highlight: "Book lessons 1 month in advance."
+            },
+            {
+                day: 3,
+                date: "Jan 26 (Mon)",
+                title: "Refinement & Application",
+                theme: "Snowboarding",
+                location: "Yuzawa (Iwappara 岩原)",
+                icon: "📉",
+                events: [
+                    { time: "09:30", title: "Morning Lesson", detail: "Correcting form, steeper gradients." },
+                    { time: "12:00", title: "Lunch", detail: "Pizzeria La Locanda del Pittore (Wood-fired pizza)." },
+                    { time: "13:00", title: "Self-Practice", detail: "Apply techniques solo. Build muscle memory." },
+                    { time: "19:00", title: "Dinner", detail: "Hegi Soba (片木蕎麥麵) at Nakanoya Yuzawa Honten (中野屋 湯澤本店)." }
+                ],
+                highlight: "Famous pizza place requires patience or timing."
+            },
+            {
+                day: 4,
+                date: "Jan 27 (Tue)",
+                title: "Art & Alpine Culture",
+                theme: "Culture & Snow",
+                location: "Yuzawa (Kiyotsu 清津峽 / Kandatsu 神立)",
+                icon: "🎨",
+                events: [
+                    { time: "09:30", title: "Kiyotsu Gorge (清津峽)", detail: "Yukiguni Gosetsu Liner to see MAD Architects' Tunnel of Light." },
+                    { time: "13:00", title: "Afternoon Riding", detail: "Kandatsu Snow Resort (神立高原滑雪場). North-facing slopes." },
+                    { time: "Evening", title: "Optional Nighter", detail: "Extend into night skiing if energy permits." },
+                    { time: "19:00", title: "Dinner", detail: "Seafood Izakaya: Kaisen Doraku Totoya (海鮮道樂 Totoya)." }
+                ],
+                highlight: "Kiyotsu Gorge reflection pool is a top photo spot."
+            },
+            {
+                day: 5,
+                date: "Jan 28 (Wed)",
+                title: "Transit to Karuizawa",
+                theme: "Snow & Shopping",
+                location: "Yuzawa (湯澤) → Karuizawa (輕井澤)",
+                icon: "🚅",
+                events: [
+                    { time: "08:00", title: "Final Snow Session", detail: "Yuzawa Kogen (湯澤高原) (Ropeway access). Scenic run." },
+                    { time: "13:00", title: "Shinkansen Transit", detail: "Yuzawa → Takasaki (高崎) → Karuizawa (~50 mins + connection)." },
+                    { time: "15:00", title: "Check-in & Shopping", detail: "Karuizawa Prince Hotel West (輕井澤王子大飯店). Prince Shopping Plaza (王子購物廣場)." },
+                    { time: "19:30", title: "Dinner", detail: "Suju Masayuki (酢重正之) (Japanese dining)." }
+                ],
+                highlight: "Largest outlet mall in Japan."
+            },
+            {
+                day: 6,
+                date: "Jan 29 (Thu)",
+                title: "Organic Architecture",
+                theme: "Architecture",
+                location: "Karuizawa (輕井澤)",
+                icon: "⛪",
+                events: [
+                    { time: "Morning", title: "Church Tour", detail: "Stone Church (石之教堂) & Karuizawa Kogen Church (輕井澤高原教堂)." },
+                    { time: "Lunch", title: "Harunire Terrace (榆樹街小鎮)", detail: "Sawamura Bakery (澤村烘焙坊)." },
+                    { time: "Afternoon", title: "Nature Walk", detail: "Kumoba Pond (雲場池) & Mampei Hotel Cafe (萬平酒店)." },
+                    { time: "Dinner", title: "Spanish Fusion", detail: "Jose Luis." }
+                ],
+                highlight: "Stone Church is a masterpiece of organic architecture."
+            },
+            {
+                day: 7,
+                date: "Jan 30 (Fri)",
+                title: "Return to Metropolis",
+                theme: "Transit & Food",
+                location: "Karuizawa → Ueno (上野)",
+                icon: "🏙️",
+                events: [
+                    { time: "Morning", title: "Shiraito Falls (白絲瀑布)", detail: "View icy waterfalls." },
+                    { time: "14:00", title: "Transit to Tokyo", detail: "Shinkansen to Ueno Station. Check-in NOHGA HOTEL UENO (UENO NOHGA 酒店)." },
+                    { time: "Evening", title: "Ameyoko Market (阿美橫丁)", detail: "Street food and vibrant atmosphere." },
+                    { time: "Dinner", title: "Yakiniku", detail: "Local BBQ spot in Ueno." }
+                ],
+                highlight: "Shift from nature back to urban energy."
+            },
+            {
+                day: 8,
+                date: "Jan 31 (Sat)",
+                title: "Tokyo Design & Retail",
+                theme: "Shopping",
+                location: "Omotesando (表參道) / Shibuya (澀谷)",
+                icon: "👠",
+                events: [
+                    { time: "10:00", title: "Omotesando Architecture", detail: "Prada, Sunny Hills (微熱山丘), Nezu Museum (根津美術館)." },
+                    { time: "13:00", title: "Shibuya Shopping", detail: "Parco (Nintendo/Pokemon), Miyashita Park (宮下公園)." },
+                    { time: "Coffee", title: "Blue Bottle (藍瓶咖啡)", detail: "Kitaya Park location." },
+                    { time: "Dinner", title: "Sukiyaki Finale", detail: "Ibuki (伊吹) (Shinjuku) or Ningyocho Imahan (人形町今半)." }
+                ],
+                highlight: "High-end retail mixed with world-class architecture."
+            },
+            {
+                day: 9,
+                date: "Feb 1 (Sun)",
+                title: "Departure",
+                theme: "Logistics",
+                location: "Ueno → Narita (成田)",
+                icon: "🛫",
+                events: [
+                    { time: "09:00", title: "Last Meal: Tsukemen", detail: "Menya Musashi (麵屋武藏) or Rokurinsha (六厘舍)." },
+                    { time: "11:00", title: "Snack Shopping", detail: "Takeya (多慶屋) in Okachimachi (御徒町)." },
+                    { time: "13:30", title: "Skyliner", detail: "Keisei Ueno (京成上野) to Narita Airport." },
+                    { time: "16:55", title: "Flight", detail: "Departure." }
+                ],
+                highlight: "Smooth exit via Skyliner."
+            }
+        ];
+
+        const foodList = [
+            { name: "Godai Hanayama Udon (五代目 花山烏冬)", type: "Udon", loc: "Ginza (銀座)", note: "Himokawa wide noodles" },
+            { name: "Mochi-buta Curry (越後麻糬豬咖哩)", type: "Lunch", loc: "Ishiuchi", note: "Rice-fed pork" },
+            { name: "La Locanda del Pittore", type: "Pizza", loc: "Iwappara", note: "Wood-fired, slope-side" },
+            { name: "Nakanoya Honten (中野屋 湯澤本店)", type: "Hegi Soba", loc: "Yuzawa", note: "Seaweed binder noodles" },
+            { name: "Kaisen Doraku Totoya (海鮮道樂)", type: "Seafood", loc: "Yuzawa", note: "Nodoguro Sashimi" },
+            { name: "Sawamura Bakery (澤村烘焙坊)", type: "Bakery", loc: "Karuizawa", note: "Harunire Terrace" },
+            { name: "Imahan (人形町今半)", type: "Sukiyaki", loc: "Tokyo", note: "Premium Wagyu" }
+        ];
+
+        const archList = [
+            { name: "Stone Church (石之教堂)", loc: "Karuizawa", note: "Kendrick Kellogg. Organic stone arches." },
+            { name: "Sunny Hills (微熱山丘)", loc: "Omotesando", note: "Kengo Kuma. Intricate wood lattice." },
+            { name: "Prada Building", loc: "Omotesando", note: "Herzog & de Meuron. Glass bubble grid." },
+            { name: "Nezu Museum (根津美術館)", loc: "Aoyama", note: "Kengo Kuma. Bamboo approach & Garden." },
+            { name: "Tunnel of Light (清津峽)", loc: "Kiyotsu", note: "MAD Architects. Reflection pool." }
+        ];
+
+        // --- RESORT MAP DATA ---
+        const resortData = {
+            ishiuchi: {
+                name: "Ishiuchi Maruyama (石打丸山)",
+                desc: "Technical terrain with 23 diverse courses. Home to one of Japan's best terrain parks and expansive night skiing.",
+                stats: { beg: 30, int: 40, adv: 30, elev: 920, run: 4 },
+                markers: [
+                    { top: '80%', left: '50%', label: 'Sunrise Exp (Base)', type: 'lift' },
+                    { top: '50%', left: '40%', label: 'The Veranda (View)', type: 'food' },
+                    { top: '20%', left: '50%', label: 'Summit (920m)', type: 'peak' },
+                    { top: '60%', left: '70%', label: 'Monster Pipe', type: 'park' }
+                ]
+            },
+            iwappara: {
+                name: "Iwappara (岩原)",
+                desc: "Famous for its ultra-wide 'barn door' slope. Perfect for beginners and carving practice with zero congestion.",
+                stats: { beg: 40, int: 40, adv: 20, elev: 985, run: 4 },
+                markers: [
+                    { top: '85%', left: '50%', label: 'Base Area', type: 'lift' },
+                    { top: '55%', left: '50%', label: 'Wide Burn (Main)', type: 'run' },
+                    { top: '40%', left: '30%', label: 'Pizzeria Pittore', type: 'food' },
+                    { top: '25%', left: '60%', label: 'Sky Course', type: 'run' }
+                ]
+            },
+            yuzawa: {
+                name: "Yuzawa Kogen (湯澤高原)",
+                desc: "Connected directly to the station via ropeway. Features high vertical and a beginner-friendly plateau at the top.",
+                stats: { beg: 50, int: 20, adv: 30, elev: 1170, run: 5 },
+                markers: [
+                    { top: '90%', left: '20%', label: 'Ropeway Base', type: 'lift' },
+                    { top: '20%', left: '30%', label: 'Kogen Area (Top)', type: 'plateau' },
+                    { top: '50%', left: '50%', label: 'Downhill Course', type: 'run' },
+                    { top: '10%', left: '40%', label: 'Panorama View', type: 'peak' }
+                ]
+            }
+        };
+
+        // --- APP STATE ---
+        let currentDay = 1;
+        let currentResort = 'ishiuchi';
+        let difficultyChartInstance = null;
+
+        // --- DOM ELEMENTS ---
+        const dayTabsContainer = document.getElementById('day-tabs');
+        const dayContentContainer = document.getElementById('day-content');
+        const foodListContainer = document.getElementById('food-list');
+        const archListContainer = document.getElementById('arch-list');
+        const resortTabsContainer = document.getElementById('resort-tabs');
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDayTabs();
+            renderDayContent(0); // Show Day 1
+            renderCollections();
+            initCharts();
+            renderResortTabs();
+            loadResort('ishiuchi');
+        });
+
+        // --- FUNCTIONS ---
+
+        function renderDayTabs() {
+            dayTabsContainer.innerHTML = '';
+            itineraryData.forEach((day, index) => {
+                const btn = document.createElement('button');
+                btn.className = `flex-shrink-0 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 border border-slate-200 ${
+                    index + 1 === currentDay ? 'active-tab shadow-md' : 'inactive-tab'
+                }`;
+                btn.innerHTML = `
+                    <div class="text-xs opacity-70">Day ${day.day}</div>
+                    <div>${day.date.split('(')[0]}</div>
+                `;
+                btn.onclick = () => {
+                    currentDay = day.day;
+                    renderDayTabs(); // Re-render to update active class
+                    renderDayContent(index);
+                };
+                dayTabsContainer.appendChild(btn);
+            });
+        }
+
+        function renderDayContent(index) {
+            const data = itineraryData[index];
+            
+            // Animation reset
+            dayContentContainer.style.opacity = '0';
+            
+            setTimeout(() => {
+                let eventsHtml = data.events.map(event => `
+                    <div class="timeline-item relative pl-10 pb-8">
+                        <div class="timeline-connector"></div>
+                        <div class="absolute left-2 top-0 w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="time text-xs font-bold text-blue-600 mb-1">${event.time}</div>
+                        <h4 class="text-lg font-bold text-slate-800">${event.title}</h4>
+                        <p class="text-slate-600 text-sm mt-1">${event.detail}</p>
+                    </div>
+                `).join('');
+
+                dayContentContainer.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 h-full">
+                        <!-- Left: Info Panel -->
+                        <div class="bg-slate-50 p-8 border-b lg:border-b-0 lg:border-r border-slate-200">
+                            <div class="inline-block bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded mb-4 uppercase tracking-wider">${data.theme}</div>
+                            <h2 class="text-4xl font-bold text-slate-900 mb-2">Day ${data.day}</h2>
+                            <p class="text-xl text-slate-500 mb-6">${data.date}</p>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-center text-slate-700">
+                                    <span class="w-8 text-center mr-3 text-2xl">${data.icon}</span>
+                                    <span class="font-medium">${data.location}</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 bg-yellow-50 border border-yellow-100 p-4 rounded-lg">
+                                <h5 class="text-yellow-800 font-bold text-xs uppercase mb-2">Daily Strategy Note</h5>
+                                <p class="text-yellow-900 text-sm italic">"${data.highlight}"</p>
+                            </div>
+                        </div>
+
+                        <!-- Right: Timeline -->
+                        <div class="lg:col-span-2 p-8 overflow-y-auto max-h-[600px]">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Execution Schedule</h3>
+                            <div class="mt-2">
+                                ${eventsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                dayContentContainer.style.opacity = '1';
+                dayContentContainer.style.transition = 'opacity 0.3s ease-in-out';
+            }, 50);
+        }
+
+        function renderCollections() {
+            // Food
+            foodListContainer.innerHTML = foodList.map(item => `
+                <div class="flex items-start p-3 bg-white rounded-lg border border-amber-100 hover:shadow-sm transition-shadow">
+                    <div class="flex-1">
+                        <div class="font-bold text-slate-800">${item.name}</div>
+                        <div class="text-xs text-slate-500">${item.type} • ${item.loc}</div>
+                    </div>
+                    <div class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded self-center ml-2 text-right w-24">
+                        ${item.note}
+                    </div>
+                </div>
+            `).join('');
+
+            // Architecture
+            archListContainer.innerHTML = archList.map(item => `
+                <div class="bg-white p-4 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors group">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">${item.name}</div>
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">${item.loc}</span>
+                    </div>
+                    <p class="text-xs text-slate-600">${item.note}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderResortTabs() {
+            const tabs = [
+                { id: 'ishiuchi', label: 'Ishiuchi' },
+                { id: 'iwappara', label: 'Iwappara' },
+                { id: 'yuzawa', label: 'Yuzawa Kogen' }
+            ];
+            
+            resortTabsContainer.innerHTML = tabs.map(tab => `
+                <button onclick="loadResort('${tab.id}')" 
+                    class="px-6 py-4 text-sm font-bold uppercase tracking-wider transition-colors ${currentResort === tab.id ? 'text-blue-600 border-b-2 border-blue-600 bg-white' : 'text-slate-500 hover:bg-slate-100'}">
+                    ${tab.label}
+                </button>
+            `).join('');
+        }
+
+        function loadResort(resortId) {
+            currentResort = resortId;
+            renderResortTabs(); // Update active state
+            
+            const data = resortData[resortId];
+            
+            // Update Text
+            document.getElementById('resort-title').innerText = data.name;
+            document.getElementById('resort-desc').innerText = data.desc;
+            document.getElementById('resort-elev').innerText = data.stats.elev + ' m';
+            document.getElementById('resort-run').innerText = data.stats.run + ' km';
+
+            // Update Chart
+            if (difficultyChartInstance) difficultyChartInstance.destroy();
+            const ctxDiff = document.getElementById('difficultyChart').getContext('2d');
+            difficultyChartInstance = new Chart(ctxDiff, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Beg (Green)', 'Int (Red)', 'Adv (Black)'],
+                    datasets: [{
+                        data: [data.stats.beg, data.stats.int, data.stats.adv],
+                        backgroundColor: ['#4ade80', '#ef4444', '#1f2937'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+                }
+            });
+
+            // Update Map Markers
+            const mapContainer = document.getElementById('map-markers');
+            mapContainer.innerHTML = data.markers.map(m => {
+                let color = 'bg-blue-500';
+                if(m.type === 'food') color = 'bg-amber-500';
+                if(m.type === 'peak') color = 'bg-slate-800';
+                
+                return `
+                <div class="map-marker absolute w-4 h-4 rounded-full ${color} border-2 border-white shadow-lg cursor-pointer group" style="top: ${m.top}; left: ${m.left};">
+                    <div class="map-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap z-20">
+                        ${m.label}
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function initCharts() {
+            // Balance Chart
+            const ctxBalance = document.getElementById('balanceChart').getContext('2d');
+            new Chart(ctxBalance, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Snow Sports', 'Shopping', 'Culture/Food', 'Transit'],
+                    datasets: [{
+                        data: [35, 25, 25, 15], 
+                        backgroundColor: ['#3b82f6', '#f59e0b', '#10b981', '#64748b'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // Budget Chart
+            const ctxBudget = document.getElementById('budgetChart').getContext('2d');
+            new Chart(ctxBudget, {
+                type: 'bar',
+                data: {
+                    labels: ['Yuzawa', 'Karuizawa', 'Tokyo'],
+                    datasets: [
+                        {
+                            label: 'Low Est. (JPY)',
+                            data: [19000, 22000, 20000],
+                            backgroundColor: '#94a3b8',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'High Est. (JPY)',
+                            data: [25000, 30000, 28000],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { 
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toLocaleString() + ' JPY';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
